@@ -73,8 +73,6 @@
     recorder = null;
     screen?.getTracks().forEach(trk => trk.stop());
     screen = null;
-    userAudio?.getTracks().forEach(trk => trk.stop());
-    userAudio = null;
     enableUserAudio = false;
     enableSystemAudio = true;
     countDown = 5;
