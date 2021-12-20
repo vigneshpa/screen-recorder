@@ -51,23 +51,22 @@
     recorder.start();
     recorder.addEventListener('dataavailable', stop);
   }
-  let countDownStarted = false;
+  let countDownT: number | null = null;
   function startCountDown() {
     if (!screen) return alert('Select screen first');
     if (recorder) return alert('Already recording');
-    if (countDownStarted) return alert('Countdown already started');
-    countDownStarted = true;
-    const int = setInterval(() => {
+    if (countDownT) return alert('Countdown already started');
+    countDownT = window.setInterval(() => {
       if (--countDown === 0) {
         record();
-        clearInterval(int);
+        if (countDownT) clearInterval(countDownT);
         countDown = 5;
-        countDownStarted = false;
+        countDownT = null;
       }
     }, 1000);
   }
   async function stop(e: Event) {
-    if (countDownStarted) return alert("Can't do anything while count down");
+    if (countDownT) clearInterval(countDownT);
     const data: Blob = (e as any).data;
     if (data) window.open(URL.createObjectURL(data), '_blank', 'menubar=no,height=400,width=700');
     rStream?.getTracks().forEach(trk => trk.stop);
