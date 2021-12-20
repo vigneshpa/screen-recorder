@@ -41,6 +41,7 @@
       const context = new AudioContext();
       const dest = context.createMediaStreamDestination();
       if (screen.getAudioTracks().length === 0) enableSystemAudio = false;
+      if (userAudio?.getAudioTracks().length === 0) enableSystemAudio = false;
       if (enableSystemAudio) context.createMediaStreamSource(screen).connect(dest);
       if (enableUserAudio) context.createMediaStreamSource(userAudio!).connect(dest);
       if (enableSystemAudio || enableUserAudio) dest.stream.getAudioTracks().forEach(trk => rStream.addTrack(trk));
@@ -57,7 +58,7 @@
     if (countDownStarted) return alert('Countdown already started');
     countDownStarted = true;
     const int = setInterval(() => {
-      if (countDown-- === 0) {
+      if (--countDown === 0) {
         record();
         clearInterval(int);
         countDown = 5;
