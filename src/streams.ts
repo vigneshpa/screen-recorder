@@ -10,8 +10,9 @@ if (!window.WritableStream) {
     (streamSaver as any).TransformStream = pfill.TransformStream;
   });
 }
-const mitm = new URL('streamsaver/mitm.html', import.meta.url);
-const mitm_js = new URL('streamsaver/sw.js', import.meta.url);
+const mitm = new URL('streamsaver/mitm.html?asset', import.meta.url);
+const mitm_js = new URL('streamsaver/sw.js?asset', import.meta.url);
+(window as any).sw_js = mitm_js;
 (streamSaver as any).mitm = mitm;
 export { streamSaver };
 export function getBlobToUint8Stream() {

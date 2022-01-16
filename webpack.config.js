@@ -54,6 +54,14 @@ const config = {
   module: {
     rules: [
       {
+        resourceQuery: /asset/,
+        type: 'asset/resource',
+      },
+      {
+        test: /\.(png|svg|jpg|jpeg|gif|woff|woff2|eot|ttf|otf)$/i,
+        type: 'asset/resource',
+      },
+      {
         test: /\.svelte$/i,
         loader: 'svelte-loader',
         options: {
@@ -71,10 +79,6 @@ const config = {
       {
         test: /\.css$/i,
         use: [cssPlugin, cssLoader, sourceMapLoader],
-      },
-      {
-        test: /\.(png|svg|jpg|jpeg|gif|woff|woff2|eot|ttf|otf)$/i,
-        type: 'asset/resource',
       },
       {
         test: /\.ts$/i,
