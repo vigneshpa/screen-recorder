@@ -35,6 +35,7 @@ plugins.push(
     minify: true,
     scriptLoading: 'defer',
     template: resolve('index.ejs'),
+    publicPath: pPath,
   })
 );
 if (!isDev)
