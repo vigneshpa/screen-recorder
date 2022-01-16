@@ -32,6 +32,7 @@
     "workbox-webpack-plugin": "^6.4.2"
   },
   "dependencies": {
+    "html-loader": "^3.1.0",
     "html-webpack-plugin": "^5.5.0"
   }
 }

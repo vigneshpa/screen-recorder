@@ -75,12 +75,12 @@ const config = {
         type: 'asset/resource',
       },
       {
-        test: /\.wasm$/i,
-        type: 'asset/resource',
-      },
-      {
         test: /\.ts$/i,
         loader: 'ts-loader',
+      },
+      {
+        test: /\.html$/i,
+        loader: 'html-loader',
       },
     ],
   },
