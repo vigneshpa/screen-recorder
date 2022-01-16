@@ -9,7 +9,8 @@ const initApp = async () => {
   if (inited) return;
   inited = true;
   window.document.body.innerHTML = '';
-  const App = ( // Lazy loading App to link css automatically
+  const App = // Lazy loading App to link css automatically
+  (
     await import(
       /* webpackChunkName: "appComponent" */
       /* webpackMode: "lazy" */
@@ -37,7 +38,7 @@ if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
 function register() {
   if (!inited)
     // Setting inner html to loading service worker
-    window.document.body.innerHTML = loadingHtml;
+    fetch(loadingHtml).then(res => res.text().then(txt => (window.document.body.innerHTML = txt)));
   window.navigator.serviceWorker
     .register(new URL(pPath + 'service-worker.js'), { scope: pPath.href })
     .then(registration => {

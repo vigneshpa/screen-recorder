@@ -1,4 +1,6 @@
 import * as streamSaver from 'streamsaver';
+import mitm from 'streamsaver/mitm.html';
+import mitm_sw from 'streamsaver/sw.js?raw';
 if (!window.WritableStream) {
   import('web-streams-polyfill/ponyfill/es2018').then(pfill => {
     for (const key in pfill) {
@@ -10,9 +12,7 @@ if (!window.WritableStream) {
     (streamSaver as any).TransformStream = pfill.TransformStream;
   });
 }
-const mitm = new URL('streamsaver/mitm.html?asset', import.meta.url);
-const mitm_js = new URL('streamsaver/sw.js?asset', import.meta.url);
-(window as any).sw_js = mitm_js;
+(window as any).sw_js = mitm_sw;
 (streamSaver as any).mitm = mitm;
 export { streamSaver };
 export function getBlobToUint8Stream() {

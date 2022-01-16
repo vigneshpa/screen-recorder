@@ -1,10 +1,11 @@
 const { resolve } = require('path');
 const SveltePreprocess = require('svelte-preprocess');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin').default;
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const { GenerateSW } = require('workbox-webpack-plugin');
+const HtmlMinimizerPlugin = require('html-minimizer-webpack-plugin');
 
 const distPath = process.env.DIST_PATH ?? './docs';
 
@@ -14,7 +15,7 @@ const isDev = process.env.NODE_ENV === 'development';
 
 const cssLoader = 'css-loader';
 const sourceMapLoader = 'source-map-loader';
-const pPath = isDev ? '/' : '/screen-recorder/';
+const pPath = './';
 
 const cssPlugin = isDev ? 'style-loader' : MiniCssExtractPlugin.loader;
 
@@ -54,14 +55,6 @@ const config = {
   module: {
     rules: [
       {
-        resourceQuery: /asset/,
-        type: 'asset/resource',
-      },
-      {
-        test: /\.(png|svg|jpg|jpeg|gif|woff|woff2|eot|ttf|otf)$/i,
-        type: 'asset/resource',
-      },
-      {
         test: /\.svelte$/i,
         loader: 'svelte-loader',
         options: {
@@ -86,7 +79,15 @@ const config = {
       },
       {
         test: /\.html$/i,
-        loader: 'html-loader',
+        type: 'asset/resource',
+      },
+      {
+        resourceQuery: /raw/,
+        type: 'asset/resource',
+      },
+      {
+        test: /\.(png|svg|jpg|jpeg|gif|woff|woff2|eot|ttf|otf)$/i,
+        type: 'asset/resource',
       },
     ],
   },
@@ -106,7 +107,7 @@ const config = {
     publicPath: 'auto',
   },
   optimization: {
-    minimizer: [`...`, new CssMinimizerPlugin()],
+    minimizer: [`...`, new CssMinimizerPlugin(), new HtmlMinimizerPlugin()],
   },
   devtool: isDev ? 'eval-source-map' : 'source-map',
   // // Not required for small projects
