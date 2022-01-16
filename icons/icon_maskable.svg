@@ -1,52 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   version="1.1"
-   x="0"
-   y="0"
-   viewBox="0 0 1024 1024"
-   xml:space="preserve"
-   id="svg8"
-   width="1024"
-   height="1024"
-   sodipodi:docname="icon_maskable.svg"
-   inkscape:version="1.1 (c4e8f9ed74, 2021-05-24)"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   width="48"
+   height="48"
+   version="1"
+   id="svg12"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:d="https://loading.io/stock/"><sodipodi:namedview
-     id="namedview7"
-     pagecolor="#505050"
-     bordercolor="#ffffff"
-     borderopacity="1"
-     inkscape:pageshadow="0"
-     inkscape:pageopacity="0"
-     inkscape:pagecheckerboard="1"
-     showgrid="false"
-     inkscape:zoom="0.7578125"
-     inkscape:cx="511.34021"
-     inkscape:cy="512"
-     inkscape:window-width="1920"
-     inkscape:window-height="1011"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg8" /><defs
-     id="defs12" /><metadata
-     id="metadata6"><d:name>paper clip</d:name><d:tags>paper clip,paper fastener,gem clip,office clip,stationery</d:tags><d:license>by</d:license><d:slug>esdu8j</d:slug><rdf:RDF><cc:Work
-         rdf:about="" /></rdf:RDF></metadata><rect
-     style="fill:#333333;stroke-width:2.87211"
-     id="rect668"
-     width="1026"
-     height="1024"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs16" />
+  <rect
+     style="fill:#009688;fill-opacity:1;stroke:none;stroke-width:0;stroke-opacity:1;opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+     id="rect3719"
+     width="48"
+     height="48"
      x="0"
-     y="0" /><path
-     d="M 328.45545,609.07361 491.4496,326.57199 c 30.20262,-52.35923 97.10842,-70.29266 149.43297,-40.07002 v 0 c 52.32453,30.22264 70.24609,97.1728 40.04347,149.53202 l -156.90362,271.9337 a 88.337665,88.396217 0 0 1 -120.67047,32.35424 88.337665,88.396217 0 0 1 -32.3328,-120.75046 l 142.9724,-247.80563 7.50066,-13.00974 a 50.334367,50.36773 0 0 1 68.75595,-18.43381 v 0 a 50.334367,50.36773 0 0 1 18.42161,68.80154 L 460.24689,666.37654"
-     fill="none"
-     stroke="#ffffff"
-     stroke-width="23.0096"
-     stroke-linecap="round"
-     stroke-miterlimit="10"
-     id="path4" /></svg>
+     y="0" />
+  <path
+     style="opacity:0.2"
+     d="m 24,13 c -2.791856,0.0033 -5.495202,0.979906 -7.644531,2.761719 L 20.535156,23 26.1875,13.208984 C 25.46626,13.072566 24.734024,13.002611 24,13 Z M 28.177734,13.765625 24,21 H 35.298828 C 34.112189,17.65385 31.50474,15.004923 28.177734,13.765625 Z M 14.880859,17.207031 C 13.023253,19.378773 12.001694,22.142175 12,25 c 6.88e-4,0.670242 0.05753,1.339249 0.169922,2 h 8.365234 z M 27.464844,23 33.119141,32.792969 C 34.976747,30.621227 35.998306,27.857825 36,25 35.999312,24.329758 35.94247,23.660751 35.830078,23 Z m 0,4 -5.652344,9.791016 C 22.53374,36.927434 23.265976,36.997389 24,37 c 2.791856,-0.0033 5.495202,-0.979906 7.644531,-2.761719 z m -14.763672,2 c 1.186639,3.34615 3.794088,5.995077 7.121094,7.234375 L 24,29 Z"
+     id="path6" />
+  <path
+     style="fill:#ffffff"
+     d="m 24,12 c -2.791856,0.0033 -5.495202,0.979906 -7.644531,2.761719 L 20.535156,22 26.1875,12.208984 C 25.46626,12.072566 24.734024,12.002611 24,12 Z M 28.177734,12.765625 24,20 H 35.298828 C 34.112189,16.65385 31.50474,14.004923 28.177734,12.765625 Z M 14.880859,16.207031 C 13.023253,18.378773 12.001694,21.142175 12,24 c 6.88e-4,0.670242 0.05753,1.339249 0.169922,2 h 8.365234 z M 27.464844,22 33.119141,31.792969 C 34.976747,29.621227 35.998306,26.857825 36,24 c -6.88e-4,-0.670242 -0.05753,-1.339249 -0.169922,-2 z m 0,4 -5.652344,9.791016 C 22.53374,35.927434 23.265976,35.997389 24,36 c 2.791856,-0.0033 5.495202,-0.979906 7.644531,-2.761719 z m -14.763672,2 c 1.186639,3.34615 3.794088,5.995077 7.121094,7.234375 L 24,28 Z"
+     id="path8" />
+</svg>

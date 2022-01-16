@@ -1,2 +1,4 @@
 node_modules
 package-lock.json
+icons/generated
+icons/generated/favicon.ico

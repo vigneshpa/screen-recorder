@@ -1,93 +1,171 @@
 <script lang="ts">
-  let videoEl: HTMLVideoElement;
-  function videoResponder(video: HTMLVideoElement, scr: MediaStream | null) {
-    if (!video) return;
-    video.srcObject = scr ? new MediaStream(scr.getVideoTracks()) : null;
-    if (scr) video.play();
+  import Number from './Number.svelte';
+  import Recorder from './Recorder';
+  import Switch from './Switch.svelte';
+  import RecordSwitch from './RecordSwitch.svelte';
+  import { fade } from 'svelte/transition';
+  import { countdown, wait } from './utils';
+
+  const oldState = JSON.parse(
+    localStorage.getItem('screen-recorder-app-state') ||
+      JSON.stringify({
+        systemAudio: true,
+        micAudio: false,
+        saveImediately: true,
+        timeOut: 5,
+      })
+  );
+  let vid: HTMLVideoElement;
+  let r: Recorder;
+  let systemAudio: boolean = oldState.systemAudio;
+  let micAudio: boolean = oldState.micAudio;
+  let saveImediately: boolean = oldState.saveImediately;
+  let timeOut: number = oldState.timeOut;
+  let recording = false;
+  let counter = 0;
+  let counting = false;
+  let stage = 0;
+  $: {
+    localStorage.setItem(
+      'screen-recorder-app-state',
+      JSON.stringify({
+        systemAudio,
+        micAudio,
+        saveImediately,
+        timeOut,
+      })
+    );
   }
-
-  let recorder: MediaRecorder | null = null;
-  let screen: MediaStream | null = null;
-  let userAudio: MediaStream | null = null;
-  let enableUserAudio = false;
-  let enableSystemAudio = true;
-  let countDown = 5;
-  const audioResponder = async (enable: boolean) => {
-    if (!enable) {
-      userAudio?.getTracks().forEach(trk => trk.stop());
-      userAudio = null;
-      enableUserAudio = false;
-      return;
-    }
-    userAudio = await navigator.mediaDevices.getUserMedia({ audio: true });
-    if (!userAudio) enableUserAudio = false;
-  };
-  $: audioResponder(enableUserAudio);
-  $: videoResponder(videoEl, screen);
-
+  async function reset() {
+    recording = false;
+    stage = 0;
+  }
   async function select() {
-    screen = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
-    screen.getVideoTracks()[0].addEventListener('ended', e => recorder?.stop() || stop(e as any));
+    r = new Recorder({ microphone: micAudio, systemAudio, timeslice: 5000 });
+    r.addEventListener('stopping', reset);
+    r.addEventListener('error', reset);
+    (window as any).r = r;
+    vid.srcObject = r.rStream;
+    vid.play();
+    await r.requestStreams();
+    stage++;
   }
-  let rStream: MediaStream;
-  async function record() {
-    if (!screen) return alert('Select screen first');
-    if (recorder) return alert('Already recording');
-    rStream = new MediaStream();
-    screen.getVideoTracks().forEach(trk => rStream.addTrack(trk));
-
-    // Audio Pipelining
-    {
-      const context = new AudioContext();
-      const dest = context.createMediaStreamDestination();
-      if (screen.getAudioTracks().length === 0) enableSystemAudio = false;
-      if (userAudio?.getAudioTracks().length === 0) enableSystemAudio = false;
-      if (enableSystemAudio) context.createMediaStreamSource(screen).connect(dest);
-      if (enableUserAudio) context.createMediaStreamSource(userAudio!).connect(dest);
-      if (enableSystemAudio || enableUserAudio) dest.stream.getAudioTracks().forEach(trk => rStream.addTrack(trk));
+  async function toogle() {
+    if (recording) {
+      r.stop();
+    } else {
+      counting = true;
+      for await (let i of countdown(timeOut)) counter = i;
+      counting = false;
+      r.saveStream();
+      recording = true;
+      stage++;
     }
-
-    recorder = new MediaRecorder(rStream);
-    recorder.start();
-    recorder.addEventListener('dataavailable', stop);
-  }
-  let countDownT: number | null = null;
-  function startCountDown() {
-    if (!screen) return alert('Select screen first');
-    if (recorder) return alert('Already recording');
-    if (countDownT) return alert('Countdown already started');
-    countDownT = window.setInterval(() => {
-      if (--countDown === 0) {
-        record();
-        if (countDownT) clearInterval(countDownT);
-        countDown = 5;
-        countDownT = null;
-      }
-    }, 1000);
-  }
-  async function stop(e: Event) {
-    if (countDownT) clearInterval(countDownT);
-    const data: Blob = (e as any).data;
-    if (data) window.open(URL.createObjectURL(data), '_blank', 'menubar=no,height=400,width=700');
-    rStream?.getTracks().forEach(trk => trk.stop);
-    recorder = null;
-    screen?.getTracks().forEach(trk => trk.stop());
-    screen = null;
-    enableUserAudio = false;
-    enableSystemAudio = true;
-    countDown = 5;
   }
 </script>
 
-<h1>Hello</h1>
-<button on:click={() => select()}>Select</button>
-<button on:click={() => startCountDown()}>Record</button>
-<button on:click={e => recorder?.stop() || stop(e)}>Stop</button><br />
-<input type="checkbox" id="sysAudio" bind:checked={enableSystemAudio} />
-<label for="sysAudio">System Audio</label><br />
-<input type="checkbox" id="userAudio" bind:checked={enableUserAudio} />
-<label for="userAudio">Audio from microphone</label><br />
-<label for="countdown">Count down in seconds</label>
-<input id="countdown" type="number" bind:value={countDown} />
-<!-- svelte-ignore a11y-media-has-caption -->
-<video bind:this={videoEl} width="1000" />
+<div class="vid">
+  <!-- svelte-ignore a11y-media-has-caption -->
+  <video bind:this={vid} muted />
+</div>
+<div class="overlay">
+  <div class="pannel">
+    <div class="options" class:hidden={stage !== 0}>
+      <Switch bind:value={systemAudio}>Record system audio</Switch>
+      <Switch bind:value={micAudio}>Record from microphone</Switch>
+      <Switch bind:value={saveImediately}>Save video while recroding (recomended)</Switch>
+      <button on:click={() => select()}>Select Screen</button>
+    </div>
+    <div class="countdown" class:hidden={stage !== 1}>
+      <Number bind:value={timeOut}>Countdown</Number>
+    </div>
+    <div class="record" class:hidden={stage !== 2 && stage !== 1}>
+      <RecordSwitch bind:recording {toogle} />
+    </div>
+  </div>
+  {#if counting}
+    <div transition:fade class="counter">{counter}</div>
+  {/if}
+</div>
+
+<style>
+  :global(body) {
+    color: white;
+    background-color: #131313;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+      'Open Sans', 'Helvetica Neue', sans-serif;
+  }
+  :global(:root) {
+    font-size: 14px;
+  }
+  .vid {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    /* background-color: green; */
+    z-index: -1;
+  }
+  .overlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    z-index: 0;
+  }
+  .counter {
+    text-align: center;
+    font-size: 10rem;
+    line-height: 100%;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(48, 48, 48, 0.76);
+    position: absolute;
+    margin: auto;
+  }
+  .pannel {
+    background-color: rgba(37, 37, 37, 0.959);
+    padding: 2rem;
+    bottom: 0;
+    position: absolute;
+    margin: 2rem;
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+  .pannel > div {
+    transition: max-height 0.7s ease;
+    max-height: 13rem;
+    overflow: hidden;
+  }
+  .pannel > .hidden {
+    max-height: 0px;
+    overflow: hidden;
+  }
+  video {
+    width: 100%;
+    height: 100%;
+  }
+  button {
+    padding: 0.7rem;
+    font-size: 1rem;
+    margin: 1rem;
+    border-radius: 0.5rem;
+    border: none;
+    background-color: rgb(214, 214, 214);
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: rgb(141, 141, 141);
+  }
+  button:active {
+    background-color: rgb(75, 75, 75);
+  }
+</style>

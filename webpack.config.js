@@ -23,7 +23,11 @@ plugins.push(
   new CopyPlugin({
     patterns: [
       { from: 'icons/generated', to: 'icons' },
-      { from: 'webmanifest.js', to: 'manifest.webmanifest', transform: content => require('./webmanifest')(pPath) },
+      {
+        from: 'webmanifest.js',
+        to: 'manifest.webmanifest',
+        transform: content => require('./webmanifest')(pPath),
+      },
     ],
   }),
   new HtmlWebpackPlugin({
@@ -77,10 +81,6 @@ const config = {
       {
         test: /\.ts$/i,
         loader: 'ts-loader',
-      },
-      {
-        test: /\.html$/i,
-        loader: 'html-loader',
       },
     ],
   },
