@@ -34,7 +34,7 @@ plugins.push(
     inject: 'head',
     minify: true,
     scriptLoading: 'defer',
-    title: 'Screen Recorder',
+    template: resolve('index.ejs'),
   })
 );
 if (!isDev)
