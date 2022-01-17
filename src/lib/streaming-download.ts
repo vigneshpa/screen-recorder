@@ -22,5 +22,8 @@ export function saveStream(
       filename,
     })
   );
-  setTimeout(() => window.open('./streaming-downloads/' + filename, '_blank'), 2000);
+  setTimeout(
+    () => window.open(import.meta.env.BASE_URL + 'streaming-downloads/' + filename, '_blank'),
+    2000
+  );
 }

@@ -3,11 +3,13 @@ import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { VitePWA } from 'vite-plugin-pwa';
 import getManifest from './webmanifest.js';
 
+const base = '/screen-recorder/';
+
 export default defineConfig({
   plugins: [
     svelte(),
     VitePWA({
-      manifest: getManifest('./'),
+      manifest: getManifest(base),
       registerType: 'autoUpdate',
       strategies: 'injectManifest',
       srcDir: 'src',
@@ -16,5 +18,5 @@ export default defineConfig({
     }),
   ],
   build: { sourcemap: true, outDir: './docs' },
-  base: './',
+  base,
 });

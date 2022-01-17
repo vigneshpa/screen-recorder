@@ -2,7 +2,7 @@ import { registerRoute } from 'workbox-routing';
 
 declare let self: ServiceWorkerGlobalScope;
 
-const basePath = '/streaming-downloads/';
+const basePath = import.meta.env.BASE_URL + 'streaming-downloads/';
 
 const responses = new Map<string, Response>();
 
