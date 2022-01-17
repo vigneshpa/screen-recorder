@@ -26,3 +26,14 @@ export function saveBlob(filename: string, blob: Blob) {
   link.remove();
   setTimeout(() => URL.revokeObjectURL(url));
 }
+export function downloadURL(url: string) {
+  let hiddenIFrameID = 'hiddenDownloader',
+    iframe = document.getElementById(hiddenIFrameID) as HTMLIFrameElement;
+  if (iframe === null) {
+    iframe = document.createElement('iframe');
+    iframe.id = hiddenIFrameID;
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+  }
+  iframe.src = url;
+}

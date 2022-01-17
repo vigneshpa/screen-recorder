@@ -1,3 +1,5 @@
+import { downloadURL } from './utils';
+
 export function saveStream(
   filename: string,
   stream: ReadableStream<Uint8Array>,
@@ -22,8 +24,5 @@ export function saveStream(
       filename,
     })
   );
-  setTimeout(
-    () => window.open(import.meta.env.BASE_URL + 'streaming-downloads/' + filename, '_blank'),
-    2000
-  );
+  setTimeout(() => downloadURL(import.meta.env.BASE_URL + 'streaming-downloads/' + filename), 1000);
 }
