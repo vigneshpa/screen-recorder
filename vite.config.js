@@ -15,6 +15,10 @@ export default defineConfig({
       srcDir: 'src',
       filename: 'sw.ts',
       includeManifestIcons: false,
+      devOptions: {
+        enabled: true,
+        type: 'classic',
+      },
     }),
   ],
   build: { sourcemap: true, outDir: './docs' },

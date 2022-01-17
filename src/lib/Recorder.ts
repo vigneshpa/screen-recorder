@@ -1,5 +1,5 @@
 import { saveStream } from './streaming-download';
-import { getBlobToUint8Stream, saveBlob } from './utils';
+import { saveBlob } from './utils';
 
 interface RecorderConfig {
   systemAudio: boolean;
@@ -58,17 +58,22 @@ export default class Recorder extends window.EventTarget {
     if (this.state !== 'gotPermissions') this.throwError("The recorder's state is invalid");
     const ext = this.recorder.mimeType.split(';')[0].split('/')[1] || 'webm';
     if (this.config.timeslice) {
-      const trns = getBlobToUint8Stream();
-      const writer = trns.writable.getWriter();
-      saveStream('output.' + ext, trns.readable);
-      this.recorder.addEventListener('dataavailable', e => writer.write(e.data));
-      this.recorder.addEventListener('stop', _ =>
-        setTimeout(_ => {
-          writer.close();
-          this.state = 'stopped';
-          this.dispatchEvent(new Event('stopped'));
-        }, 1000)
-      );
+      const recorder = this;
+      const readable = new ReadableStream<Uint8Array>({
+        start(controller) {
+          recorder.recorder.addEventListener('dataavailable', async e =>
+            controller.enqueue(new Uint8Array(await e.data.arrayBuffer()))
+          );
+          recorder.recorder.addEventListener('stop', _ =>
+            setTimeout(_ => {
+              controller.close();
+              recorder.state = 'stopped';
+              recorder.dispatchEvent(new Event('stopped'));
+            }, 1000)
+          );
+        },
+      });
+      saveStream('output.' + ext, readable);
       this.recorder.start(this.config.timeslice);
       setTimeout(() => this.recorder.requestData(), 1000);
     } else {
