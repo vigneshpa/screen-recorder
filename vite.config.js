@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [
     svelte(),
     VitePWA({
-      manifest: getManifest('/'),
+      manifest: getManifest('./'),
       registerType: 'autoUpdate',
       strategies: 'injectManifest',
       srcDir: 'src',
