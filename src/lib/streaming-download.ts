@@ -6,9 +6,9 @@ export function saveStream(
   contentType: string = 'application/octet-stream'
 ) {
   if (!window.navigator.serviceWorker.controller) throw new Error('No service worker registered');
-  const headers = new Map();
-  headers.set('Content-Disposition', `attachment; filename="${filename}"`);
-  headers.set('Content-Type', contentType);
+  const headers: [string, string][] = [];
+  headers.push(['Content-Disposition', `attachment; filename="${filename}"`]);
+  headers.push(['Content-Type', contentType]);
   window.navigator.serviceWorker.controller.postMessage(
     {
       type: 'streaming-downloads-response',

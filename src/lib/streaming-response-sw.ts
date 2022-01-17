@@ -27,7 +27,7 @@ self.addEventListener('message', e => {
     const data = e.data as {
       filename: string;
       stream: ReadableStream<Uint8Array>;
-      headers: Map<string, string>;
+      headers: [string, string][];
     };
     const path = basePath + data.filename;
 
@@ -35,7 +35,7 @@ self.addEventListener('message', e => {
     if (resOld) responses.delete(path);
 
     const headers = new Headers();
-    data.headers.forEach((val, key) => headers.set(key, val));
+    data.headers.forEach(val => headers.set(val[0], val[1]));
     responses.set(path, new Response(data.stream, { headers }));
     console.log('registering', path);
   } else if (e.data.type === 'streaming-downloads-revoke') {
