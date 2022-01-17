@@ -1,4 +1,4 @@
-node_modules
-package-lock.json
-icons/generated
-icons/generated/favicon.ico
+/node_modules/
+/dist/
+/.vscode/
+.DS_Store

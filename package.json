@@ -1,36 +1,23 @@
 {
   "name": "screen-recorder",
-  "version": "1.0.0",
-  "description": "A simple screen recorder",
-  "main": "index.js",
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "serve": "NODE_ENV=development webpack serve",
-    "build": "NODE_ENV=production webpack build"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-check --tsconfig ./tsconfig.json"
   },
-  "keywords": [
-    "screen",
-    "recorder"
-  ],
-  "author": "vignesh <vignesh-p@outlook.com>",
-  "license": "GPL-3.0",
   "devDependencies": {
-    "@types/streamsaver": "^2.0.1",
-    "copy-webpack-plugin": "^10.2.0",
-    "css-loader": "^6.5.1",
-    "css-minimizer-webpack-plugin": "^3.3.0",
-    "html-minimizer-webpack-plugin": "^3.5.0",
-    "html-webpack-plugin": "^5.5.0",
-    "mini-css-extract-plugin": "^2.4.5",
-    "source-map-loader": "^3.0.0",
-    "streamsaver": "^2.0.5",
-    "svelte": "^3.44.3",
-    "svelte-loader": "^3.1.2",
-    "svelte-preprocess": "^4.10.1",
-    "ts-loader": "^9.2.6",
-    "web-streams-polyfill": "^3.2.0",
-    "webpack": "^5.65.0",
-    "webpack-cli": "^4.9.1",
-    "webpack-dev-server": "^4.6.0",
-    "workbox-webpack-plugin": "^6.4.2"
+    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.30",
+    "@tsconfig/svelte": "^2.0.1",
+    "svelte": "^3.44.0",
+    "svelte-check": "^2.2.7",
+    "svelte-preprocess": "^4.9.8",
+    "tslib": "^2.3.1",
+    "typescript": "^4.4.4",
+    "vite": "^2.7.2",
+    "vite-plugin-pwa": "^0.11.13",
+    "web-streams-polyfill": "^3.2.0"
   }
 }

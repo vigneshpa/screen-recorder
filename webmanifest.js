@@ -1,5 +1,5 @@
-const { join } = require('path');
-module.exports = publicPath => {
+import { join } from 'path';
+export default function getManifest(publicPath) {
   const sizes = [96, 128, 192, 256, 384, 512];
   function generateIconSources(src) {
     const ret = [];
@@ -36,5 +36,5 @@ module.exports = publicPath => {
     start_url: '.',
     icons: generateIconSources('icons/icon'),
   };
-  return JSON.stringify(manifest);
-};
+  return manifest;
+}

@@ -1,10 +1,10 @@
 <script lang="ts">
-  import Number from './Number.svelte';
-  import Recorder from './Recorder';
-  import Switch from './Switch.svelte';
-  import RecordSwitch from './RecordSwitch.svelte';
+  import Number from './lib/Number.svelte';
+  import Recorder from './lib/Recorder';
+  import Switch from './lib/Switch.svelte';
+  import RecordSwitch from './lib/RecordSwitch.svelte';
   import { fade } from 'svelte/transition';
-  import { countdown, wait } from './utils';
+  import { countdown } from './lib/utils';
 
   const oldState = JSON.parse(
     localStorage.getItem('screen-recorder-app-state') ||
@@ -41,7 +41,11 @@
     stage = 0;
   }
   async function select() {
-    r = new Recorder({ microphone: micAudio, systemAudio, timeslice: 5000 });
+    r = new Recorder({
+      microphone: micAudio,
+      systemAudio,
+      timeslice: saveImediately ? 10000 : undefined,
+    });
     r.addEventListener('stopping', reset);
     r.addEventListener('error', reset);
     (window as any).r = r;
