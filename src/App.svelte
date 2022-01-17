@@ -44,7 +44,7 @@
     r = new Recorder({
       microphone: micAudio,
       systemAudio,
-      timeslice: saveImediately ? 10000 : undefined,
+      timeslice: saveImediately ? 3000 : undefined,
     });
     r.addEventListener('stopping', reset);
     r.addEventListener('error', reset);

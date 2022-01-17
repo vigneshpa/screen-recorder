@@ -1,3 +1,4 @@
+import { passStream } from './message-channel-stream';
 import { downloadURL } from './utils';
 
 export function saveStream(
@@ -9,15 +10,30 @@ export function saveStream(
   const headers: [string, string][] = [];
   headers.push(['Content-Disposition', `attachment; filename="${filename}"`]);
   headers.push(['Content-Type', contentType]);
-  window.navigator.serviceWorker.controller.postMessage(
-    {
-      type: 'streaming-downloads-response',
-      filename,
-      stream,
-      headers,
-    },
-    [stream as any]
-  );
+  try {
+    window.navigator.serviceWorker.controller.postMessage(
+      {
+        type: 'streaming-downloads-response',
+        filename,
+        stream,
+        headers,
+      },
+      [stream as any]
+    );
+  } catch (e) {
+    console.warn(e);
+    const channel = new MessageChannel();
+    passStream(stream, channel.port1, chunk => [chunk.buffer]);
+    window.navigator.serviceWorker.controller.postMessage(
+      {
+        type: 'streaming-downloads-response-port',
+        filename,
+        port: channel.port2,
+        headers,
+      },
+      [channel.port2]
+    );
+  }
   window.addEventListener('beforeunload', _ =>
     window.navigator.serviceWorker.controller!.postMessage({
       type: 'streaming-downloads-revoke',

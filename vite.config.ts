@@ -17,7 +17,6 @@ export default defineConfig({
       includeManifestIcons: false,
       devOptions: {
         enabled: true,
-        type: 'classic',
       },
     }),
   ],

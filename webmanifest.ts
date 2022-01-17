@@ -31,7 +31,7 @@ export default function getManifest(publicPath) {
     description: 'An easy way to record screen!',
     background_color: '#131313',
     theme_color: '#131313',
-    orientation: 'portrait',
+    orientation: 'portrait' as 'portrait',
     display: 'standalone',
     start_url: '.',
     icons: generateIconSources('icons/icon'),

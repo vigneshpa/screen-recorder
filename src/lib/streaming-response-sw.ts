@@ -1,4 +1,5 @@
 import { registerRoute } from 'workbox-routing';
+import { getStream } from './message-channel-stream';
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -20,15 +21,20 @@ registerRoute(
     return response;
   }
 );
-
 self.addEventListener('message', e => {
   if (!e.isTrusted) return console.log('Request from non trustworthy page');
-  if (e.data.type === 'streaming-downloads-response') {
+  if (
+    e.data.type === 'streaming-downloads-response' ||
+    e.data.type === 'streaming-downloads-response-port'
+  ) {
     const data = e.data as {
       filename: string;
       stream: ReadableStream<Uint8Array>;
       headers: [string, string][];
     };
+    if (e.data.type === 'streaming-downloads-response-port') {
+      data.stream = getStream<Uint8Array>(e.data.port);
+    }
     const path = basePath + data.filename;
 
     const resOld = responses.has(path);
