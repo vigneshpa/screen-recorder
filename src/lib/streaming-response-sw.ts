@@ -31,6 +31,7 @@ self.addEventListener('message', e => {
       filename: string;
       stream: ReadableStream<Uint8Array>;
       headers: [string, string][];
+      status: number;
     };
     if (e.data.type === 'streaming-downloads-response-port') {
       data.stream = getStream<Uint8Array>(e.data.port);
@@ -42,7 +43,7 @@ self.addEventListener('message', e => {
 
     const headers = new Headers();
     data.headers.forEach(val => headers.set(val[0], val[1]));
-    responses.set(path, new Response(data.stream, { headers }));
+    responses.set(path, new Response(data.stream, { headers, status: data.status }));
     console.log('registering', path);
   } else if (e.data.type === 'streaming-downloads-revoke') {
     const path = basePath + e.data.filename;

@@ -1,5 +1,5 @@
 import { saveStream } from './streaming-download';
-import { saveBlob } from './utils';
+import { saveBlob, wait } from './utils';
 
 interface RecorderConfig {
   systemAudio: boolean;
@@ -59,23 +59,41 @@ export default class Recorder extends window.EventTarget {
     const ext = this.recorder.mimeType.split(';')[0].split('/')[1] || 'webm';
     if (this.config.timeslice) {
       const recorder = this;
+      let enqueue: (chunk: Uint8Array) => void;
+      let resolve: (() => void) | null;
       const readable = new ReadableStream<Uint8Array>({
         start(controller) {
-          recorder.recorder.addEventListener('dataavailable', async e =>
-            controller.enqueue(new Uint8Array(await e.data.arrayBuffer()))
-          );
-          recorder.recorder.addEventListener('stop', _ =>
-            setTimeout(_ => {
-              controller.close();
-              recorder.state = 'stopped';
-              recorder.dispatchEvent(new Event('stopped'));
-            }, 1000)
-          );
+          enqueue = e => {
+            controller.enqueue(e);
+            wait(recorder.config.timeslice).then(() => {
+              if (resolve) {
+                resolve();
+                resolve = null;
+              }
+            });
+          };
+          recorder.recorder.addEventListener('dataavailable', async e => {
+            const chunk = new Uint8Array(await e.data.arrayBuffer());
+            enqueue(chunk);
+          });
+          recorder.recorder.addEventListener('stop', _ => {
+            wait(recorder.config.timeslice! * 2).then(() => controller.close());
+            recorder.state = 'stopped';
+            recorder.dispatchEvent(new Event('stopped'));
+          });
+        },
+        pull() {
+          return new Promise(res => {
+            resolve = res;
+            if (recorder.recorder.state === 'recording') recorder.recorder.requestData();
+          });
+        },
+        cancel() {
+          recorder.stop();
         },
       });
-      saveStream('output.' + ext, readable);
-      this.recorder.start(this.config.timeslice);
-      setTimeout(() => this.recorder.requestData(), 1000);
+      saveStream('output.' + ext, readable, this.recorder.mimeType);
+      this.recorder.start();
     } else {
       this.recorder.addEventListener('dataavailable', e => saveBlob('output', e.data));
       this.recorder.addEventListener('stop', _ => {

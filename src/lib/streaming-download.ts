@@ -10,6 +10,8 @@ export function saveStream(
   const headers: [string, string][] = [];
   headers.push(['Content-Disposition', `attachment; filename="${filename}"`]);
   headers.push(['Content-Type', contentType]);
+  headers.push(['Connection', 'close']);
+  headers.push(['Cache-Control', 'no-cache']);
   try {
     window.navigator.serviceWorker.controller.postMessage(
       {
@@ -17,6 +19,7 @@ export function saveStream(
         filename,
         stream,
         headers,
+        status: 200,
       },
       [stream as any]
     );
@@ -30,6 +33,7 @@ export function saveStream(
         filename,
         port: channel.port2,
         headers,
+        status: 200,
       },
       [channel.port2]
     );
