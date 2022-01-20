@@ -77,7 +77,7 @@
     <div class="options" class:hidden={stage !== 0}>
       <Switch bind:value={systemAudio}>Record system audio</Switch>
       <Switch bind:value={micAudio}>Record from microphone</Switch>
-      <Switch bind:value={saveImediately}>Save video while recroding (recomended)</Switch>
+      <Switch bind:value={saveImediately}>Save video while recording (recomended)</Switch>
       <button on:click={() => select()}>Select Screen</button>
     </div>
     <div class="countdown" class:hidden={stage !== 1}>
