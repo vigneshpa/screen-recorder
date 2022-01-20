@@ -42,6 +42,9 @@ export default class Recorder extends window.EventTarget {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     this.config.microphone = stream.getAudioTracks().length > 0;
     if (!this.config.microphone) return;
+    this.recorder.addEventListener('stop', _ =>
+      setTimeout(_ => stream.getTracks().forEach(trk => trk.stop()), 300)
+    );
     this.aCtx.createMediaStreamSource(stream!).connect(this.aDest);
   }
   async requestStreams() {
