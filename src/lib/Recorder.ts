@@ -111,6 +111,7 @@ export default class Recorder extends window.EventTarget {
     if (this.state === 'recording') this.recorder.stop();
     else this.throwError('Cannot stop recording');
     this.state = 'stopping';
+    this.aCtx.close();
     this.dispatchEvent(new Event('stopping'));
   }
   throwError(error: string) {
