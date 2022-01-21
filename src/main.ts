@@ -2,10 +2,7 @@ import App from './App.svelte';
 import { registerSW } from 'virtual:pwa-register';
 import ponyfill from './ponyfill';
 
-registerSW({
-  onNeedRefresh() {},
-  onOfflineReady() {},
-});
+registerSW();
 const mount = () => (window.app = new App({ target: window.document.body }));
 
 ponyfill().then(mount);
