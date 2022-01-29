@@ -26,7 +26,7 @@ export default class Recorder extends window.EventTarget {
   async requestScreen() {
     const stream = await navigator.mediaDevices.getDisplayMedia({
       video: true,
-      audio: true,
+      audio: this.config.systemAudio,
     });
     if (stream.getVideoTracks().length < 1) this.throwError('Unable to get video');
     stream.getVideoTracks().forEach(trk => this.rStream.addTrack(trk));
@@ -57,7 +57,7 @@ export default class Recorder extends window.EventTarget {
     this.dispatchEvent(new Event('gotPermissions'));
     return this.rStream;
   }
-  saveStream() {
+  saveStream(filename = 'output') {
     if (this.state !== 'gotPermissions') this.throwError("The recorder's state is invalid");
     const ext = this.recorder.mimeType.split(';')[0].split('/')[1] || 'webm';
     if (this.config.timeslice) {
@@ -95,10 +95,10 @@ export default class Recorder extends window.EventTarget {
           recorder.stop();
         },
       });
-      saveStream('output.' + ext, readable, this.recorder.mimeType);
+      saveStream(filename + '.' + ext, readable, this.recorder.mimeType);
       this.recorder.start();
     } else {
-      this.recorder.addEventListener('dataavailable', e => saveBlob('output', e.data));
+      this.recorder.addEventListener('dataavailable', e => saveBlob(filename + '.' + ext, e.data));
       this.recorder.addEventListener('stop', _ => {
         this.state = 'stopped';
         this.dispatchEvent(new Event('stopped'));
