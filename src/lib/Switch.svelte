@@ -31,6 +31,7 @@
     border-radius: 1rem;
     padding: 2px;
     margin: 0.2rem;
+    flex-shrink: 0;
   }
   .switch .but {
     height: 1rem;
