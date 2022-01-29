@@ -1,6 +1,4 @@
-import { passStream } from './message-channel-stream';
 import { downloadURL } from './utils';
-
 export function saveStream(
   filename: string,
   stream: ReadableStream<Uint8Array>,
@@ -25,18 +23,32 @@ export function saveStream(
     );
   } catch (e) {
     console.warn(e);
-    const channel = new MessageChannel();
-    passStream(stream, channel.port1, chunk => [chunk.buffer]);
-    window.navigator.serviceWorker.controller.postMessage(
-      {
-        type: 'streaming-downloads-response-port',
-        filename,
-        port: channel.port2,
-        headers,
-        status: 200,
-      },
-      [channel.port2]
-    );
+    const id = Math.floor(Math.random() * 10 ** 5);
+    window.navigator.serviceWorker.controller.postMessage({
+      type: 'streaming-downloads-response-chunked',
+      filename,
+      headers,
+      id,
+      status: 200,
+    });
+    const reader = stream.getReader();
+    (function read() {
+      reader.read().then(({ done, value }) => {
+        if (!done) {
+          window.navigator.serviceWorker.controller!.postMessage({
+            type: 'streaming-downloads-response-chunk',
+            id,
+            data: value,
+          });
+          read();
+        } else {
+          window.navigator.serviceWorker.controller!.postMessage({
+            type: 'streaming-downloads-response-stop',
+            id,
+          });
+        }
+      });
+    })();
   }
   window.addEventListener('beforeunload', _ =>
     window.navigator.serviceWorker.controller!.postMessage({
