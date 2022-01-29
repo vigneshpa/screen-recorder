@@ -19,6 +19,7 @@ registerRoute(
         }
       );
     const response = responses.get(url.pathname)!;
+    responses.delete(url.pathname);
     return response;
   }
 );
