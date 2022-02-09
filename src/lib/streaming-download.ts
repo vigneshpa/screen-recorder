@@ -2,8 +2,9 @@ import { downloadURL } from './utils';
 export function saveStream(
   filename: string,
   blobStream: ReadableStream<Blob>,
-  contentType: string = 'application/octet-stream'
+  contentType?: string
 ) {
+  contentType = contentType || 'application/octet-stream';
   // if ('showSaveFilePicker' in window) {
   //   window
   //     .showSaveFilePicker({

@@ -5,6 +5,8 @@ interface RecorderConfig {
   systemAudio: boolean;
   microphone: boolean;
   timeslice?: number;
+  mime: string;
+  ext: string;
 }
 export default class Recorder extends window.EventTarget {
   config: RecorderConfig;
@@ -18,7 +20,7 @@ export default class Recorder extends window.EventTarget {
     super();
     this.config = config;
     this.rStream = new MediaStream();
-    this.recorder = new MediaRecorder(this.rStream);
+    this.recorder = new MediaRecorder(this.rStream, { mimeType: this.config.mime });
     this.aCtx = new AudioContext();
     this.aDest = this.aCtx.createMediaStreamDestination();
     this.state = 'idle';
@@ -32,9 +34,7 @@ export default class Recorder extends window.EventTarget {
     stream.getVideoTracks().forEach(trk => this.rStream.addTrack(trk));
     if (this.config.systemAudio) this.config.systemAudio = stream.getAudioTracks().length > 0;
     if (this.config.systemAudio) this.aCtx.createMediaStreamSource(stream).connect(this.aDest);
-    this.recorder.addEventListener('stop', _ =>
-      setTimeout(_ => stream.getTracks().forEach(trk => trk.stop()), 300)
-    );
+    this.recorder.addEventListener('stop', _ => setTimeout(_ => stream.getTracks().forEach(trk => trk.stop()), 300));
     stream.getVideoTracks()[0].addEventListener('ended', () => this.stop());
   }
   async requestMicrophone() {
@@ -42,9 +42,7 @@ export default class Recorder extends window.EventTarget {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     this.config.microphone = stream.getAudioTracks().length > 0;
     if (!this.config.microphone) return;
-    this.recorder.addEventListener('stop', _ =>
-      setTimeout(_ => stream.getTracks().forEach(trk => trk.stop()), 300)
-    );
+    this.recorder.addEventListener('stop', _ => setTimeout(_ => stream.getTracks().forEach(trk => trk.stop()), 300));
     this.aCtx.createMediaStreamSource(stream!).connect(this.aDest);
   }
   async requestStreams() {
@@ -59,8 +57,7 @@ export default class Recorder extends window.EventTarget {
   }
   saveStream(filename = 'screencapture-' + new Date().toLocaleDateString().replaceAll('/', '-')) {
     if (this.state !== 'gotPermissions') this.throwError("The recorder's state is invalid");
-    const ext = this.recorder.mimeType.split(';')[0].split('/')[1] || 'webm';
-    if (this.config.timeslice) {
+    if (this.config.timeslice && window.navigator.serviceWorker.controller) {
       const recorder = this;
       let enqueue: (chunk: Blob) => void;
       let resolve: (() => void) | null;
@@ -94,10 +91,10 @@ export default class Recorder extends window.EventTarget {
           recorder.stop();
         },
       });
-      saveStream(filename + '.' + ext, readable, this.recorder.mimeType);
+      saveStream(filename + '.' + this.config.ext, readable, this.config.mime);
       this.recorder.start();
     } else {
-      this.recorder.addEventListener('dataavailable', e => saveBlob(filename + '.' + ext, e.data));
+      this.recorder.addEventListener('dataavailable', e => saveBlob(filename + '.' + this.config.ext, e.data));
       this.recorder.addEventListener('stop', _ => {
         this.state = 'stopped';
         this.dispatchEvent(new Event('stopped'));

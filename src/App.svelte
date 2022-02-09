@@ -5,6 +5,7 @@
   import RecordSwitch from './lib/RecordSwitch.svelte';
   import { fade } from 'svelte/transition';
   import { countdown } from './lib/utils';
+  import getAllSupportedMimeTypes, { extesnstions } from './getAllSupportedMimeTypes';
 
   window.addEventListener('beforeunload', function closeHandler(e) {
     if (r?.state === 'recording' || r?.state === 'stopping') {
@@ -12,34 +13,52 @@
       e.preventDefault();
     }
   });
+  const storeVersion = 2;
+  const supportedMimeTypes = getAllSupportedMimeTypes();
 
-  const oldState = JSON.parse(
-    localStorage.getItem('screen-recorder-app-state') ||
-      JSON.stringify({
-        systemAudio: true,
-        micAudio: false,
-        saveImediately: true,
-        timeOut: 5,
-      })
-  );
+  let __oldStore = JSON.parse(localStorage.getItem('screen-recorder-app-state') || '{}');
+  const oldState =
+    __oldStore.storeVersion !== storeVersion
+      ? (() => {
+          const container = supportedMimeTypes.keys().next().value;
+          const videoCodec = supportedMimeTypes.get(container)!.keys().next().value;
+          const audioCodec = supportedMimeTypes.get(container)!.get(videoCodec)![0];
+          return {
+            systemAudio: true,
+            micAudio: false,
+            saveImediately: true,
+            timeOut: 5,
+            container,
+            videoCodec,
+            audioCodec,
+          };
+        })()
+      : __oldStore;
   let vid: HTMLVideoElement;
   let r: Recorder;
   let systemAudio: boolean = oldState.systemAudio;
   let micAudio: boolean = oldState.micAudio;
   let saveImediately: boolean = oldState.saveImediately;
   let timeOut: number = oldState.timeOut;
+  let container: string = oldState.container;
+  let videoCodec: string = oldState.videoCodec;
+  let audioCodec: string = oldState.audioCodec;
   let recording = false;
   let counter = 0;
   let counting = false;
   let stage = 0;
   $: {
     localStorage.setItem(
-      'screen-recorder-app-state',
+      'screen-recorder-app-state-v1',
       JSON.stringify({
         systemAudio,
         micAudio,
         saveImediately,
         timeOut,
+        container,
+        videoCodec,
+        audioCodec,
+        storeVersion,
       })
     );
   }
@@ -52,6 +71,8 @@
       microphone: micAudio,
       systemAudio,
       timeslice: saveImediately ? 500 : undefined,
+      mime: `video/${container};codecs="${videoCodec},${audioCodec}"`,
+      ext: extesnstions.get(container)!,
     });
     r.addEventListener('stopping', reset);
     r.addEventListener('error', reset);
@@ -81,11 +102,44 @@
 </div>
 <div class="overlay">
   <div class="pannel">
+    <div class="video-options" class:hidden={stage != -1}>
+      <label>
+        Container:
+        <select bind:value={container}>
+          {#each Array.from(supportedMimeTypes.keys()) as val}
+            <option value={val}>{val}</option>
+          {/each}
+        </select>
+      </label>
+      <label>
+        Video Codec:
+        <select bind:value={videoCodec}>
+          {#if container}
+            {#each Array.from(supportedMimeTypes.get(container)?.keys() || []) as val}
+              <option value={val}>{val}</option>
+            {/each}
+          {/if}
+        </select>
+      </label>
+      <label>
+        Audio Codec:
+        <select bind:value={audioCodec}>
+          {#if videoCodec}
+            {#each supportedMimeTypes?.get(container)?.get(videoCodec) || [] as val}
+              <option value={val}>{val}</option>
+            {/each}
+          {/if}
+        </select>
+      </label>
+      <button on:click={() => stage++}>Done</button>
+    </div>
     <div class="options" class:hidden={stage !== 0}>
       <Switch bind:value={systemAudio}>Record system audio</Switch>
       <Switch bind:value={micAudio}>Record from microphone</Switch>
       <Switch bind:value={saveImediately}>Save video while recording (recomended)</Switch>
       <button on:click={() => select()}>Select Screen</button>
+      <!-- svelte-ignore a11y-missing-attribute -->
+      <a on:click={() => stage--}>change video settings</a><br />
     </div>
     <div class="countdown" class:hidden={stage !== 1}>
       <Number bind:value={timeOut}>Countdown</Number>
@@ -103,8 +157,8 @@
   :global(body) {
     color: white;
     background-color: #131313;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
-      'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
+      'Helvetica Neue', sans-serif;
   }
   :global(:root) {
     font-size: 14px;
@@ -153,12 +207,35 @@
   }
   .pannel > div {
     transition: max-height 0.7s ease;
-    max-height: 13rem;
+    max-height: 14rem;
     overflow: hidden;
   }
   .pannel > .hidden {
     max-height: 0px;
     overflow: hidden;
+  }
+  .pannel a {
+    color: rgb(163, 163, 255);
+    cursor: default;
+  }
+  .pannel a:hover {
+    color: rgb(118, 118, 204);
+  }
+  .video-options label {
+    display: block;
+    padding: 0.2rem;
+    margin: 0.3rem;
+  }
+  .video-options select {
+    background: none;
+    color: white;
+    border: none;
+    border-bottom: solid 0.1rem grey;
+    padding: 0.3rem;
+  }
+  .video-options option {
+    color: black;
+    background-color: white;
   }
   video {
     width: 100%;
