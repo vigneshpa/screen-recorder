@@ -6,6 +6,13 @@
   import { fade } from 'svelte/transition';
   import { countdown } from './lib/utils';
 
+  window.addEventListener('beforeunload', function closeHandler(e) {
+    if (r?.state === 'recording' || r?.state === 'stopping') {
+      e.returnValue = 'Do not close this window while recording';
+      e.preventDefault();
+    }
+  });
+
   const oldState = JSON.parse(
     localStorage.getItem('screen-recorder-app-state') ||
       JSON.stringify({

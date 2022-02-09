@@ -68,12 +68,6 @@ export function saveStream(
       });
     })();
   }
-  window.addEventListener('beforeunload', _ =>
-    window.navigator.serviceWorker.controller!.postMessage({
-      type: 'streaming-downloads-revoke',
-      filename,
-    })
-  );
   setTimeout(() => downloadURL(import.meta.env.BASE_URL + 'streaming-downloads/' + filename), 1000);
 }
 
