@@ -13,7 +13,7 @@ registerRoute(
   async ({ url }) => {
     if (!responses.has(url.pathname))
       return new Response(
-        `The file you are trying to download is no longer available.\nTry reloading this page`,
+        `No stream exists!<br/>You cannot download a file again in streaming downloads.<br/>The stream is gone :(`,
         {
           status: 404,
         }
