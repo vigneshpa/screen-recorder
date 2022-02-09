@@ -49,7 +49,7 @@
   let stage = 0;
   $: {
     localStorage.setItem(
-      'screen-recorder-app-state-v1',
+      'screen-recorder-app-state',
       JSON.stringify({
         systemAudio,
         micAudio,
