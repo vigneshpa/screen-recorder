@@ -62,9 +62,9 @@ export default class Recorder extends window.EventTarget {
     const ext = this.recorder.mimeType.split(';')[0].split('/')[1] || 'webm';
     if (this.config.timeslice) {
       const recorder = this;
-      let enqueue: (chunk: Uint8Array) => void;
+      let enqueue: (chunk: Blob) => void;
       let resolve: (() => void) | null;
-      const readable = new ReadableStream<Uint8Array>({
+      const readable = new ReadableStream<Blob>({
         start(controller) {
           enqueue = e => {
             controller.enqueue(e);
@@ -76,8 +76,7 @@ export default class Recorder extends window.EventTarget {
             });
           };
           recorder.recorder.addEventListener('dataavailable', async e => {
-            const chunk = new Uint8Array(await e.data.arrayBuffer());
-            enqueue(chunk);
+            enqueue(e.data);
           });
           recorder.recorder.addEventListener('stop', _ => {
             wait(recorder.config.timeslice! * 2).then(() => controller.close());
