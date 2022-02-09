@@ -5,5 +5,6 @@ declare let self: ServiceWorkerGlobalScope;
 
 precacheAndRoute(self.__WB_MANIFEST);
 
-self.skipWaiting();
+// May be incompetable with old scripts
+// self.skipWaiting();
 clientsClaim();

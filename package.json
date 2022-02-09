@@ -19,5 +19,8 @@
     "vite": "^2.7.2",
     "vite-plugin-pwa": "^0.11.13",
     "web-streams-polyfill": "^3.2.0"
+  },
+  "dependencies": {
+    "@types/wicg-file-system-access": "^2020.9.5"
   }
 }

@@ -1,10 +1,28 @@
 import { downloadURL } from './utils';
 export function saveStream(
   filename: string,
-  stream: ReadableStream<Uint8Array>,
+  blobStream: ReadableStream<Blob>,
   contentType: string = 'application/octet-stream'
 ) {
+  if ('showSaveFilePicker' in window) {
+    window
+      .showSaveFilePicker({
+        suggestedName: filename,
+      })
+      .then(async handle => {
+        const writer = await handle.createWritable();
+        const reader = blobStream.getReader();
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          await writer.write(value!);
+        }
+        writer.close();
+      });
+    return;
+  }
   if (!window.navigator.serviceWorker.controller) throw new Error('No service worker registered');
+  const stream = blobToUint8ArrayStream(blobStream);
   const headers: [string, string][] = [];
   headers.push(['Content-Disposition', `attachment; filename="${filename}"`]);
   headers.push(['Content-Type', contentType]);
@@ -57,4 +75,18 @@ export function saveStream(
     })
   );
   setTimeout(() => downloadURL(import.meta.env.BASE_URL + 'streaming-downloads/' + filename), 1000);
+}
+
+function blobToUint8ArrayStream(instream: ReadableStream<Blob>) {
+  let reader: ReadableStreamReader<Blob>;
+  return new ReadableStream({
+    start() {
+      reader = instream.getReader();
+    },
+    async pull(controller) {
+      const { value, done } = await reader.read();
+      if (done) controller.close();
+      else controller.enqueue(await value!.arrayBuffer());
+    },
+  });
 }
