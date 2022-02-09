@@ -13,9 +13,12 @@ registerRoute(
   async ({ url }) => {
     if (!responses.has(url.pathname))
       return new Response(
-        `No stream exists!<br/>You cannot download a file again in streaming downloads.<br/>The stream is gone :(`,
+        `No stream exists!\nYou cannot download a file again in streaming downloads\nAre you shareing the download url 😒`,
         {
           status: 404,
+          headers: new Headers({
+            'Content-Type': 'text/plain;charset=UTF-8',
+          }),
         }
       );
     const response = responses.get(url.pathname)!;
