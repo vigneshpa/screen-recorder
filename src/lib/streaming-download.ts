@@ -79,14 +79,14 @@ export function saveStream(
 
 function blobToUint8ArrayStream(instream: ReadableStream<Blob>) {
   let reader: ReadableStreamReader<Blob>;
-  return new ReadableStream({
+  return new ReadableStream<Uint8Array>({
     start() {
       reader = instream.getReader();
     },
     async pull(controller) {
       const { value, done } = await reader.read();
       if (done) controller.close();
-      else controller.enqueue(await value!.arrayBuffer());
+      else controller.enqueue(new Uint8Array(await value!.arrayBuffer()));
     },
   });
 }
