@@ -57,7 +57,7 @@ export default class Recorder extends window.EventTarget {
     this.dispatchEvent(new Event('gotPermissions'));
     return this.rStream;
   }
-  saveStream(filename = 'screencapture_' + new Date().toLocaleDateString()) {
+  saveStream(filename = 'screencapture-' + new Date().toLocaleDateString().replaceAll('/', '-')) {
     if (this.state !== 'gotPermissions') this.throwError("The recorder's state is invalid");
     const ext = this.recorder.mimeType.split(';')[0].split('/')[1] || 'webm';
     if (this.config.timeslice) {
