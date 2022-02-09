@@ -107,7 +107,7 @@
         Container:
         <select bind:value={container}>
           {#each Array.from(supportedMimeTypes.keys()) as val}
-            <option value={val}>{val}</option>
+            <option value={val}>{val} (*.{extesnstions.get(val)})</option>
           {/each}
         </select>
       </label>
