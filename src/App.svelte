@@ -4,7 +4,7 @@
   import Switch from './lib/Switch.svelte';
   import RecordSwitch from './lib/RecordSwitch.svelte';
   import { fade } from 'svelte/transition';
-  import { countdown } from './lib/utils';
+  import { countdown, isFirefox } from './lib/utils';
   import getAllSupportedMimeTypes, { extesnstions } from './getAllSupportedMimeTypes';
 
   window.addEventListener('beforeunload', function closeHandler(e) {
@@ -71,7 +71,10 @@
       microphone: micAudio,
       systemAudio,
       timeslice: saveImediately ? 500 : undefined,
-      mime: `video/${container};codecs="${videoCodec},${audioCodec}"`,
+      mime:
+        // Bug in firefox
+        // media encoder do not accept codecs= but codecs:
+        'video/' + container + (isFirefox ? ';codecs:' : ';codecs=') + videoCodec + ',' + audioCodec,
       ext: extesnstions.get(container)!,
     });
     r.addEventListener('stopping', reset);

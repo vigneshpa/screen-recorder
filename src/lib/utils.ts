@@ -30,3 +30,4 @@ export function downloadURL(url: string) {
   }
   iframe.src = url;
 }
+export const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
