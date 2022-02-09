@@ -13,7 +13,7 @@ registerRoute(
   async ({ url }) => {
     if (!responses.has(url.pathname))
       return new Response(
-        `No stream exists!\nYou cannot download a file again in streaming downloads\nAre you shareing the download url 😒`,
+        `No stream exists!\nYou cannot download a file again in streaming downloads\nAre you sharing the download url 😒`,
         {
           status: 404,
           headers: new Headers({
