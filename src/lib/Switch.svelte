@@ -27,7 +27,7 @@
     font-size: 20px; /* 1 */
     height: 1rem;
     width: 2rem;
-    background: #bdb9a6;
+    background: #7a786e;
     border-radius: 1rem;
     padding: 2px;
     margin: 0.2rem;
@@ -37,14 +37,14 @@
     height: 1rem;
     width: 1rem;
     border-radius: 1rem;
-    background: #fff;
-    box-shadow: 0 0.1rem 0.3rem rgba(0, 0, 0, 0.3);
+    background: #504f4a;
+    /* box-shadow: 0 0.1rem 0.3rem rgba(0, 0, 0, 0.3); */
     transition: all 300ms;
   }
   .switch input:checked + .but {
     transform: translate3d(100%, 0, 0);
-    background-color: #1f49a3;
-    box-shadow: 0 0 5px grey;
+    background-color: #252525;
+    box-shadow: 0 0 3px grey;
   }
   .txt {
     margin: 0.2rem;
