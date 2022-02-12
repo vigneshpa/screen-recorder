@@ -47,8 +47,8 @@ export default class Recorder extends window.EventTarget {
   }
   async requestStreams() {
     if (this.state !== 'idle') this.throwError('Recorder is not idle');
-    await this.requestScreen();
     await this.requestMicrophone();
+    await this.requestScreen();
     if (this.config.microphone || this.config.systemAudio)
       this.aDest.stream.getAudioTracks().forEach(trk => this.rStream.addTrack(trk));
     this.state = 'gotPermissions';
