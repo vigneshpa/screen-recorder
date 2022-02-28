@@ -177,6 +177,7 @@
     overflow: hidden;
     /* background-color: green; */
     z-index: -1;
+    filter: blur(3px) opacity(0.4);
   }
   .overlay {
     position: fixed;
