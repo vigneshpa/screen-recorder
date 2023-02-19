@@ -1,3 +1,4 @@
+import type { StreamingDownloadResponse } from './streaming-response-sw';
 import { downloadURL } from './utils';
 export function saveStream(
   filename: string,
@@ -37,37 +38,41 @@ export function saveStream(
         stream,
         headers,
         status: 200,
-      },
-      [stream as any]
+      } as StreamingDownloadResponse,
+      [stream]
     );
   } catch (e) {
-    console.warn(e);
-    const id = Math.floor(Math.random() * 10 ** 5);
+    console.warn(e, "Trying with message channel");
+
+    const channel = new MessageChannel();
+
+    const port = channel.port1;
+
+    let reader: ReadableStreamDefaultReader<Uint8Array>;
+    port.addEventListener("message", async e => {
+      try {
+        if (e.data === "start") {
+          reader = stream.getReader();
+        } else if (e.data === "pull") {
+          const { value, done } = await reader.read();
+          if (done) port.postMessage("close");
+          else port.postMessage(value);
+        } else if (e.data === "cancel") {
+          reader.cancel();
+        }
+      } catch (e) {
+        port.postMessage("error");
+      }
+    });
+
     window.navigator.serviceWorker.controller.postMessage({
-      type: 'streaming-downloads-response-chunked',
       filename,
       headers,
-      id,
       status: 200,
-    });
-    const reader = stream.getReader();
-    (function read() {
-      reader.read().then(({ done, value }) => {
-        if (!done) {
-          window.navigator.serviceWorker.controller!.postMessage({
-            type: 'streaming-downloads-response-chunk',
-            id,
-            data: value,
-          });
-          read();
-        } else {
-          window.navigator.serviceWorker.controller!.postMessage({
-            type: 'streaming-downloads-response-stop',
-            id,
-          });
-        }
-      });
-    })();
+      stream: channel.port2
+    } as StreamingDownloadResponse
+      , [channel.port2]);
+
   }
   setTimeout(() => downloadURL(import.meta.env.BASE_URL + 'streaming-downloads/' + filename), 1000);
 }
@@ -83,5 +88,8 @@ function blobToUint8ArrayStream(instream: ReadableStream<Blob>) {
       if (done) controller.close();
       else controller.enqueue(new Uint8Array(await value!.arrayBuffer()));
     },
+    cancel(reason) {
+      reader.cancel(reason);
+    }
   });
 }

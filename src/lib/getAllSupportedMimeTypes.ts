@@ -1,3 +1,7 @@
+type VideoCodec = string;
+type AudioCodec = string;
+type Container = string;
+type containerDetails = Map<VideoCodec, AudioCodec[]>;
 export default function getAllSupportedMimeTypes() {
   const containerFormats = ['webm', 'x-matroska', 'mp4', 'ogg'];
   const videoCodecs = [
@@ -11,10 +15,6 @@ export default function getAllSupportedMimeTypes() {
     ['mp4v'],
   ];
   const audioCodecs = [['opus'], ['aac'], ['vorbis'], ['mp4a']];
-  type VideoCodec = string;
-  type AudioCodec = string;
-  type Container = string;
-  type containerDetails = Map<VideoCodec, AudioCodec[]>;
   const ret: Map<Container, containerDetails> = new Map();
   for (let container of containerFormats) {
     if (!MediaRecorder.isTypeSupported('video/' + container)) continue;

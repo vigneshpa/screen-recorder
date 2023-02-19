@@ -5,7 +5,7 @@
   import RecordSwitch from './lib/RecordSwitch.svelte';
   import { fade } from 'svelte/transition';
   import { countdown, isFirefox } from './lib/utils';
-  import getAllSupportedMimeTypes, { extesnstions } from './getAllSupportedMimeTypes';
+  import getAllSupportedMimeTypes, { extesnstions } from './lib/getAllSupportedMimeTypes';
 
   window.addEventListener('beforeunload', function closeHandler(e) {
     if (r?.state === 'recording' || r?.state === 'stopping') {
@@ -142,7 +142,7 @@
       <Switch bind:value={saveImediately}>Save video while recording (recomended)</Switch>
       <button on:click={() => select()}>Select Screen</button>
       <!-- svelte-ignore a11y-missing-attribute -->
-      <a on:click={() => stage--}>change video settings</a><br />
+      <a on:click={() => stage--} on:keypress={()=>stage--}>change video settings</a><br />
     </div>
     <div class="countdown" class:hidden={stage !== 1}>
       <Number bind:value={timeOut}>Countdown</Number>

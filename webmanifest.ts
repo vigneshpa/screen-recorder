@@ -1,8 +1,9 @@
 import { join } from 'path';
+import { ManifestOptions } from 'vite-plugin-pwa';
 export default function getManifest(publicPath) {
   const sizes = [96, 128, 192, 256, 384, 512];
   function generateIconSources(src) {
-    const ret = [];
+    const ret:Record<string, string>[] = [];
     if (src) {
       ret.push({ src: join(publicPath, src + '.svg'), sizes: '1024x1024', purpose: 'any' });
       ret.push({
@@ -25,7 +26,7 @@ export default function getManifest(publicPath) {
     }
     return ret;
   }
-  const manifest = {
+  const manifest:Partial<ManifestOptions> = {
     name: 'Screen Recorder',
     short_name: 'Screen Recorder',
     description: 'An easy way to record screen!',

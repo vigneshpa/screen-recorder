@@ -6,12 +6,14 @@ const basePath = import.meta.env.BASE_URL + 'streaming-downloads/';
 
 const responses = new Map<string, Response>();
 
-const controllers = new Map<string, ReadableStreamDefaultController<Uint8Array>>();
-
 registerRoute(
   ({ url }) => url.pathname.startsWith(basePath),
   async ({ url }) => {
-    if (!responses.has(url.pathname))
+    const filename = url.pathname.slice(basePath.length);
+    if (filename === "ping")
+      return new Response("pong", { status: 200 });
+
+    if (!responses.has(filename))
       return new Response(
         `No stream exists!\nYou cannot download a file again in streaming downloads\nAre you sharing the download url 😒`,
         {
@@ -21,59 +23,63 @@ registerRoute(
           }),
         }
       );
-    const response = responses.get(url.pathname)!;
-    responses.delete(url.pathname);
+
+    const response = responses.get(filename)!;
+    responses.delete(filename);
     return response;
   }
 );
 self.addEventListener('message', e => {
-  if (!e.isTrusted) return console.log('Request from non trustworthy page');
-  if (e.data.type === 'streaming-downloads-response') {
+  if (!e.isTrusted) return console.log('Message from an untrustworthy page');
+  if (e.data.type === 'streaming-downloads-response')
     registerStreamingDownloads(e.data);
-  } else if (e.data.type === 'streaming-downloads-revoke') {
-    const path = basePath + e.data.filename;
-    if (responses.has(path)) responses.delete(path);
-  } else if (e.data.type === 'streaming-downloads-response-chunked') {
-    const id: string = e.data.id;
-    const preque: Uint8Array[] = [];
-    controllers.set(id, {
-      enqueue: (chunk: Uint8Array | undefined) => {
-        if (chunk) preque.push(chunk);
-      },
-    } as any);
-    e.data.stream = new ReadableStream({
-      start(controller) {
-        controllers.set(id, controller);
-        preque.forEach(chunk => controller.enqueue(chunk));
-      },
-    });
-    registerStreamingDownloads(e.data);
-  } else if (e.data.type === 'streaming-downloads-response-chunk') {
-    const { id, data: chunk } = e.data as { id: string; data: Uint8Array };
-    if (controllers.has(id)) {
-      controllers.get(id)!.enqueue(chunk);
-    } else console.warn('No such id to enque the chunk');
-  } else if (e.data.type === 'streaming-downloads-response-stop') {
-    const { id } = e.data as { id: string };
-    if (controllers.has(id)) {
-      controllers.get(id)!.close();
-      controllers.delete(id);
-    } else console.warn('No such stream id to close');
-  }
+  else if (e.data.type === 'streaming-downloads-revoke')
+    if (responses.has(e.data.filename)) responses.delete(e.data.filename);
 });
-function registerStreamingDownloads(data: {
+
+export interface StreamingDownloadResponse {
   filename: string;
-  stream: ReadableStream<Uint8Array>;
+  stream: ReadableStream<Uint8Array> | MessagePort;
   headers: [string, string][];
   status: number;
-}) {
-  const path = basePath + data.filename;
+};
 
-  const resOld = responses.has(path);
-  if (resOld) responses.delete(path);
+function registerStreamingDownloads(data: StreamingDownloadResponse) {
+  const filename = data.filename;
+
+  const resOld = responses.has(filename);
+  if (resOld) responses.delete(filename);
 
   const headers = new Headers();
   data.headers.forEach(val => headers.set(val[0], val[1]));
-  responses.set(path, new Response(data.stream, { headers, status: data.status }));
-  console.log('registering', path);
+
+  const stream =
+    (data.stream instanceof MessagePort) ? messagePortToStream(data.stream) : data.stream;
+
+  responses.set(filename, new Response(stream, { headers, status: data.status }));
+  console.log('registering', filename);
+}
+
+function messagePortToStream(port:MessagePort):ReadableStream<Uint8Array>{
+  return new ReadableStream({
+    start(controller) {
+        port.addEventListener("message", e=>{
+          if(!(e.data instanceof Uint8Array)){
+            if(e.data === "close")
+              controller.close();
+            if(e.data === "error")
+              controller.error();
+            return console.log("Unknown message recived");
+          }
+          controller.enqueue(e.data);
+        });
+        port.postMessage("start");
+    },
+    pull(controller) {
+        port.postMessage("pull");
+    },
+    cancel(reason){
+      port.postMessage("cancel");
+    }
+  });
 }

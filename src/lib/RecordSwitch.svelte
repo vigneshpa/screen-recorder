@@ -6,7 +6,7 @@
 </script>
 
 <div class="container">
-  <div class="ring" on:click={toogle} class:recording>
+  <div class="ring" on:click={toogle} on:keydown={toogle} class:recording>
     <div class="innerdiv" class:recording />
   </div>
 </div>

@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { VitePWA } from 'vite-plugin-pwa';
-import getManifest from './webmanifest.js';
+import getManifest from './webmanifest';
 
 const base = '/screen-recorder/';
 
