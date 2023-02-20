@@ -1,5 +1,6 @@
 import type { StreamingDownloadResponse } from './streaming-response-sw';
 import { downloadURL } from './utils';
+const pingInterval = setInterval(e=>fetch(import.meta.env.BASE_URL + 'streaming-downloads/ping'), 10000);
 export function saveStream(
   filename: string,
   blobStream: ReadableStream<Blob>,
@@ -75,6 +76,7 @@ export function saveStream(
 
   }
   setTimeout(() => downloadURL(import.meta.env.BASE_URL + 'streaming-downloads/' + filename), 1000);
+
 }
 
 function blobToUint8ArrayStream(instream: ReadableStream<Blob>) {
