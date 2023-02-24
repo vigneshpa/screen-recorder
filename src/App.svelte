@@ -246,7 +246,7 @@
     height: 100%;
   }
   button {
-    padding: 0.7rem;
+    padding: 0.7rem 1.4rem;
     font-size: 1rem;
     margin: 1rem;
     border-radius: 0.5rem;
